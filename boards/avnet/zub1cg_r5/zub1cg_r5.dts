@@ -10,6 +10,7 @@
 #include <zephyr/dt-bindings/gpio/gpio.h>
 #include <zephyr/dt-bindings/i2c/i2c.h>
 #include <zephyr/dt-bindings/memory-attr/memory-attr-arm.h>
+#include <zephyr/dt-bindings/sensor/lps22hh.h>
 
 / {
 	model = "ZUBoard 1CG Cortex-R5";
@@ -26,6 +27,7 @@
 	aliases {
 		led0 = &red_led_0;
 		sw0 = &mio_push_btn;
+		pressure-sensor = &lps22hh;
 	};
 
 	leds: leds{
@@ -123,4 +125,16 @@
 	status = "okay";
 	current-speed = <115200>;
 	clock-frequency = <DT_FREQ_M(100)>;
+};
+
+&spi0 {
+	status = "okay";
+	clock-frequency = <DT_FREQ_M(100)>;
+
+    lps22hh: lps22hh@0 {
+		compatible = "st,lps22hh";
+		reg = <0>;
+      	odr = <LPS22HH_DT_ODR_1HZ>;
+		spi-max-frequency = <DT_FREQ_M(10)>;
+    };
 };
