@@ -99,6 +99,11 @@ void board_early_init_hook(void)
 	/* Configure Flash wait-states to support 1.2V voltage level and 150000000Hz frequency */
 	FMU0->FCTRL = (FMU0->FCTRL & ~((uint32_t)FMU_FCTRL_RWSC_MASK)) | (FMU_FCTRL_RWSC(0x3U));
 
+#ifdef CONFIG_FLASH
+	/* Enable clock for internal FMU flash */
+	CLOCK_SetupClockCtrl(SYSCON_CLOCK_CTRL_FRO12MHZ_ENA_MASK);
+#endif
+
 	/* Enable FRO HF(48MHz) output */
 	CLOCK_SetupFROHFClocking(48000000U);
 
@@ -157,6 +162,12 @@ void board_early_init_hook(void)
 	/* Configure input clock to be able to reach the datasheet specified SPI band rate. */
 	CLOCK_SetClkDiv(kCLOCK_DivFlexcom2Clk, 1u);
 	CLOCK_AttachClk(kFRO_HF_DIV_to_FLEXCOMM2);
+#endif
+
+#if DT_NODE_HAS_STATUS_OKAY(DT_NODELABEL(flexcomm3))
+	/* Configure input clock to be able to reach the datasheet specified SPI band rate. */
+	CLOCK_SetClkDiv(kCLOCK_DivFlexcom3Clk, 1u);
+	CLOCK_AttachClk(kFRO_HF_DIV_to_FLEXCOMM3);
 #endif
 
 #if DT_NODE_HAS_STATUS_OKAY(DT_NODELABEL(flexcomm4))

@@ -8,7 +8,7 @@
 #define ZEPHYR_INCLUDE_DRIVERS_CLOCK_CONTROL_NRF_CLOCK_CONTROL_H_
 
 #include <zephyr/device.h>
-#if defined(NRF_CLOCK) && !defined(NRF_LFRC)
+#ifdef NRF_CLOCK
 #include <hal/nrf_clock.h>
 #endif
 #include <zephyr/sys/onoff.h>
@@ -161,6 +161,13 @@ void z_nrf_clock_bt_ctlr_hf_request(void);
  * See z_nrf_clock_bt_ctlr_hf_request for details.
  */
 void z_nrf_clock_bt_ctlr_hf_release(void);
+
+/**
+ * @brief Get clock startup time
+ *
+ * @retval HFCLK startup time in microseconds
+ */
+uint32_t z_nrf_clock_bt_ctlr_hf_get_startup_time_us(void);
 
 #endif /* defined(CONFIG_CLOCK_CONTROL_NRF) */
 

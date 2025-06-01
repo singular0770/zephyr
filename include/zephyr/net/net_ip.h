@@ -1536,6 +1536,10 @@ static inline bool net_ipv6_addr_based_on_ll(const struct in6_addr *addr,
 
 		break;
 	case 8:
+		if (sizeof(lladdr->addr) < 8) {
+			return false;
+		}
+
 		if (!memcmp(&addr->s6_addr[9], &lladdr->addr[1],
 			    lladdr->len - 1) &&
 		    (addr->s6_addr[8] ^ 0x02) == lladdr->addr[0]) {
@@ -1548,6 +1552,19 @@ static inline bool net_ipv6_addr_based_on_ll(const struct in6_addr *addr,
 	}
 
 	return false;
+}
+
+/**
+ * @brief Get sockaddr from sockaddr_storage. This is a helper so that
+ * the code calling this function can be made shorter.
+ *
+ * @param addr Socket storage address
+ *
+ * @return Pointer to socket address (struct sockaddr)
+ */
+static inline struct sockaddr *net_sad(const struct sockaddr_storage *addr)
+{
+	return (struct sockaddr *)addr;
 }
 
 /**

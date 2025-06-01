@@ -192,6 +192,24 @@ int llext_lookup_symbol(struct llext_loader *ldr, struct llext *ext, uintptr_t *
 			LOG_ERR("Undefined symbol with no entry in "
 				"symbol table %s, offset %zd, link section %d",
 				name, (size_t)rel->r_offset, shdr->sh_link);
+
+			if (!IS_ENABLED(CONFIG_LLEXT_EXPORT_DEVICES)) {
+				/**
+				 * Attempting to import device objects from LLEXT but forgetting to
+				 * enable the corresponding Kconfig option will result in cryptic
+				 * dynamic linking errors. Try to detect this situation by checking
+				 * if the symbol's name starts with the prefix used to name device
+				 * objects, and print a special warning directing users towards the
+				 * missing Kconfig option in such circumstances.
+				 */
+				const char *const dev_prefix = STRINGIFY(DEVICE_NAME_GET(EMPTY));
+				const int prefix_len = strlen(dev_prefix);
+
+				if (strncmp(name, dev_prefix, prefix_len) == 0) {
+					LOG_WRN("(Device objects are not available for import "
+						"because CONFIG_LLEXT_EXPORT_DEVICES is not enabled)");
+				}
+			}
 			return -ENODATA;
 		}
 
@@ -299,9 +317,14 @@ static void llext_link_plt(struct llext_loader *ldr, struct llext *ext, elf_shdr
 		 * beginning of the .text section in the ELF file can be
 		 * applied to the memory location of mem[LLEXT_MEM_TEXT].
 		 *
-		 * This is valid only when CONFIG_LLEXT_STORAGE_WRITABLE=y
-		 * and peek() is usable on the source ELF file.
+		 * This is valid only for LLEXT_STORAGE_WRITABLE loaders
+		 * since the buffer will be directly modified.
 		 */
+		if (ldr->storage != LLEXT_STORAGE_WRITABLE) {
+			LOG_ERR("PLT: cannot link read-only ELF file");
+			continue;
+		}
+
 		uint8_t *rel_addr = (uint8_t *)ext->mem[LLEXT_MEM_TEXT] -
 			ldr->sects[LLEXT_MEM_TEXT].sh_offset;
 
@@ -366,7 +389,7 @@ static void llext_link_plt(struct llext_loader *ldr, struct llext *ext, elf_shdr
 int llext_link(struct llext_loader *ldr, struct llext *ext, const struct llext_load_param *ldr_parm)
 {
 	uintptr_t sect_base = 0;
-	elf_rela_t rel;
+	elf_rela_t rel = {0};
 	elf_word rel_cnt = 0;
 	const char *name;
 	int i, ret;
