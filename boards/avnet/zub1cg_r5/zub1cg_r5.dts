@@ -11,6 +11,7 @@
 #include <zephyr/dt-bindings/i2c/i2c.h>
 #include <zephyr/dt-bindings/memory-attr/memory-attr-arm.h>
 #include <zephyr/dt-bindings/sensor/lps22hh.h>
+#include <zephyr/dt-bindings/sensor/stts22h.h>
 
 / {
 	model = "ZUBoard 1CG Cortex-R5";
@@ -92,6 +93,31 @@
 			reg = <0x3ed00000 DT_SIZE_K(256)>;
 			zephyr,memory-region = "SRAM1";
 			zephyr,memory-attr = <( DT_MEM_ARM(ATTR_MPU_RAM) )>;
+		};
+
+		axi_peripherals: memory@80000000 {
+			compatible = "zephyr,memory-region";
+			reg = <0x80000000 DT_SIZE_K(64)>;
+			zephyr,memory-region = "PL_IO";
+			zephyr,memory-attr = <(DT_MEM_ARM(ATTR_MPU_IO))>;
+		};
+
+		axi_i2c_0: axi_i2c@80000000 {
+			compatible = "xlnx,xps-iic-2.1";
+			status = "okay";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x80000000 0x10000>;
+			interrupt-parent = <&gic>;
+			interrupts = <GIC_SPI 89 IRQ_TYPE_LEVEL
+					IRQ_DEFAULT_PRIORITY>;
+
+			stts22h: stts22h@3f {
+				compatible = "st,stts22h";
+				status = "okay";
+				reg = <0x3f>;
+				sampling-rate = <STTS22H_1Hz>;
+			};
 		};
 	};
 };
