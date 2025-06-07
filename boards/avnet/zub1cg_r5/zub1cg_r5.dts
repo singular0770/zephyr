@@ -102,7 +102,6 @@
 		user_switch_1: sw1 {
 			gpios = <&psgpio_bank1 18 GPIO_ACTIVE_HIGH>;
 			label = "User Switch 1";
-			zephyr,code = <INPUT_BTN_1>;
 		};
 
 		user_switch_2: sw2 {
