@@ -379,9 +379,10 @@ static DEVICE_API(uart, xlnx_uartlite_driver_api) = {
 	do {								\
 		IRQ_CONNECT(DT_INST_IRQN_BY_IDX(n, i),			\
 			    DT_INST_IRQ_BY_IDX(n, i, priority),		\
-			    xlnx_uartlite_isr,				\
-			    DEVICE_DT_INST_GET(n), 0);			\
-									\
+			    xlnx_uartlite_isr,						\
+			    DEVICE_DT_INST_GET(n), 					\
+				DT_INST_IRQ_BY_IDX(n, i, flags));		\
+														\
 		irq_enable(DT_INST_IRQN_BY_IDX(n, i));			\
 	} while (false)
 #define XLNX_UARTLITE_CONFIG_FUNC(n)					\
