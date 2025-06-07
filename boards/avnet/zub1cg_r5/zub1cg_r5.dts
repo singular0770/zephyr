@@ -34,42 +34,52 @@
 
 	leds: leds{
 		compatible = "gpio-leds";
+		
 		red_led_0: d6 {
 			gpios = <&psgpio_bank1 7 GPIO_ACTIVE_HIGH>;
 			label = "D6";
 		};
+		
 		red_led_1: d7 {
 			gpios = <&psgpio_bank0 25 GPIO_ACTIVE_HIGH>;
 			label = "D7";
 		};
+
 		red_led_2: d8 {
 			gpios = <&psgpio_bank0 24 GPIO_ACTIVE_HIGH>;
 			label = "D8";
 		};
+
 		red_led_3: d9 {
 			gpios = <&psgpio_bank0 7 GPIO_ACTIVE_HIGH>;
 			label = "D9";
 		};
+
 		rgb1_red: rbg1_red {
 			gpios = <&gpio0_2 2 GPIO_ACTIVE_HIGH>;
 			label = "RGB1 Red";
 		};
+		
 		rgb1_green: rbg1_green {
 			gpios = <&gpio0_2 1 GPIO_ACTIVE_HIGH>;
 			label = "RGB1 Green";
 		};
+
 		rgb1_blue: rbg1_blue {
 			gpios = <&gpio0_2 0 GPIO_ACTIVE_HIGH>;
 			label = "RGB1 Blue";
 		};
+
 		rgb2_red: rbg2_red {
 			gpios = <&gpio1 2 GPIO_ACTIVE_HIGH>;
 			label = "RGB2 Red";
 		};
+
 		rgb2_green: rbg2_green {
 			gpios = <&gpio1 1 GPIO_ACTIVE_HIGH>;
 			label = "RGB2 Green";
 		};
+		
 		rgb2_blue: rbg2_blue {
 			gpios = <&gpio1 0 GPIO_ACTIVE_HIGH>;
 			label = "RGB2 Blue";
@@ -78,6 +88,7 @@
 
 	keys {
 		compatible = "gpio-keys";
+
 		mio_push_btn: mio_push_btn {
 			gpios = <&psgpio_bank1 6 GPIO_ACTIVE_LOW>;
 			label = "MIO Push Button";
@@ -97,19 +108,16 @@
 		user_switch_2: sw2 {
 			gpios = <&psgpio_bank1 14 GPIO_ACTIVE_HIGH>;
 			label = "User Switch 2";
-			zephyr,code = <INPUT_BTN_2>;
 		};
 
 		user_switch_3: sw3 {
 			gpios = <&psgpio_bank1 13 GPIO_ACTIVE_HIGH>;
 			label = "User Switch 3";
-			zephyr,code = <INPUT_BTN_3>;
 		};
 
 		user_switch_4: sw4 {
 			gpios = <&psgpio_bank1 5 GPIO_ACTIVE_HIGH>;
 			label = "User Switch 4";
-			zephyr,code = <INPUT_BTN_4>;
 		};
 	};
 
@@ -120,7 +128,7 @@
 	};
 
 	soc {
-		// rproc_0_reserved in Petalinux zynqmp_openamp.dtsi
+		/* rproc_0_reserved in Petalinux zynqmp_openamp.dtsi */
 		sram1: memory@3ed00000 {
 			compatible = "zephyr,memory-region", "mmio-sram";
 			reg = <0x3ed00000 DT_SIZE_K(256)>;

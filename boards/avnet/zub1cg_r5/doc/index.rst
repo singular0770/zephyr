@@ -64,10 +64,8 @@ Currently the best way to run this sample is by loading it through remoteproc
 from the APU, running Linux, to the RPU, assuming the target board has a compatible
 Linux kernel. Users can make use of Avnet's pre-built Petalinux BSP as a starting
 point to enable remoteproc support, it is based around 6.6 Xilinx maintained kernel.
-Building Petalinux is outside the scope of this document, see the ZUBoard 1CG
-documentation for more details: 
-
-https://www.avnet.com/americas/products/avnet-boards/avnet-board-families/zuboard-1cg/
+Building Petalinux is outside the scope of this document, see the `Avnet ZUBoard 1CG
+Product Page`_ for more details. 
 
 After getting the Linux image running on the target board, build a Zephyr application,
 such as the hello world sample shown below:
@@ -133,7 +131,7 @@ zephyr.elf binary.
 References
 **********
 
-1. ARMv7-A and ARMv7-R Architecture Reference Manual (ARM DDI 0406C ID051414)
-2. Cortex-R5 and Cortex-R5F Technical Reference Manual (ARM DDI 0460C ID021511)
-3. Zynq UltraScale+ Device Technical Reference Manual (UG1085)
-4. Avnet ZUBoard 1CG Hardware User Guide (ZUBoard 1CG-HW-User-Guide-v1.0)
+.. target-notes::
+
+.. _Avnet ZUBoard 1CG Product Page:
+    https://www.avnet.com/americas/products/avnet-boards/avnet-board-families/zuboard-1cg/
