@@ -20,14 +20,14 @@
 	chosen {
 		zephyr,sram = &sram1;
 		zephyr,flash = &flash0;
-		zephyr,console = &uart0;
-		zephyr,shell-uart = &uart0;
+		zephyr,console = &axi_uartlite;
+		zephyr,shell-uart = &axi_uartlite;
 		zephyr,ocm = &ocm;
 	};
 
 	aliases {
-		led0 = &red_led_0;
-		sw0 = &mio_push_btn;
+		led0 = &rgb2_red;
+		sw0 = &pl_push_btn;
 		pressure-sensor = &lps22hh;
 		eeprom-0 = &eeprom0;
 	};
@@ -50,6 +50,30 @@
 			gpios = <&psgpio_bank0 7 GPIO_ACTIVE_HIGH>;
 			label = "D9";
 		};
+		rgb1_red: rbg1_red {
+			gpios = <&gpio0_2 2 GPIO_ACTIVE_HIGH>;
+			label = "RGB1 Red";
+		};
+		rgb1_green: rbg1_green {
+			gpios = <&gpio0_2 1 GPIO_ACTIVE_HIGH>;
+			label = "RGB1 Green";
+		};
+		rgb1_blue: rbg1_blue {
+			gpios = <&gpio0_2 0 GPIO_ACTIVE_HIGH>;
+			label = "RGB1 Blue";
+		};
+		rgb2_red: rbg2_red {
+			gpios = <&gpio1 2 GPIO_ACTIVE_HIGH>;
+			label = "RGB2 Red";
+		};
+		rgb2_green: rbg2_green {
+			gpios = <&gpio1 1 GPIO_ACTIVE_HIGH>;
+			label = "RGB2 Green";
+		};
+		rgb2_blue: rbg2_blue {
+			gpios = <&gpio1 0 GPIO_ACTIVE_HIGH>;
+			label = "RGB2 Blue";
+		};
 	};
 
 	keys {
@@ -59,24 +83,33 @@
 			label = "MIO Push Button";
 		};
 
+		pl_push_btn: pl_push_btn {
+			gpios = <&gpio0 0 GPIO_ACTIVE_LOW>;
+			label = "PS Push Button";
+		};
+
 		user_switch_1: sw1 {
 			gpios = <&psgpio_bank1 18 GPIO_ACTIVE_HIGH>;
 			label = "User Switch 1";
+			zephyr,code = <INPUT_BTN_1>;
 		};
 
 		user_switch_2: sw2 {
 			gpios = <&psgpio_bank1 14 GPIO_ACTIVE_HIGH>;
 			label = "User Switch 2";
+			zephyr,code = <INPUT_BTN_2>;
 		};
 
 		user_switch_3: sw3 {
 			gpios = <&psgpio_bank1 13 GPIO_ACTIVE_HIGH>;
 			label = "User Switch 3";
+			zephyr,code = <INPUT_BTN_3>;
 		};
 
 		user_switch_4: sw4 {
 			gpios = <&psgpio_bank1 5 GPIO_ACTIVE_HIGH>;
 			label = "User Switch 4";
+			zephyr,code = <INPUT_BTN_4>;
 		};
 	};
 
@@ -97,17 +130,50 @@
 
 		axi_peripherals: memory@80000000 {
 			compatible = "zephyr,memory-region";
-			reg = <0x80000000 DT_SIZE_K(64)>;
+			reg = <0x80000000 DT_SIZE_K(3)>;
 			zephyr,memory-region = "PL_IO";
 			zephyr,memory-attr = <(DT_MEM_ARM(ATTR_MPU_IO))>;
 		};
 
-		axi_i2c_0: axi_i2c@80000000 {
+		gpio0: gpio@80000000 {
+			compatible = "xlnx,xps-gpio-1.00.a";
+			reg = <0x80000000 0x200>;
+			#gpio-cells = <2>;
+			gpio-controller;
+			status = "okay";
+			interrupt-parent = <&gic>;
+			interrupts = <GIC_SPI 91 IRQ_TYPE_LEVEL
+					IRQ_DEFAULT_PRIORITY>;
+			xlnx,all-inputs = <1>;
+			xlnx,all-outputs-2 = <1>;
+			xlnx,gpio-width = <1>;
+			xlnx,gpio2-width = <3>;
+			xlnx,is-dual = <1>;
+
+			gpio0_2: gpio2 {
+				compatible = "xlnx,xps-gpio-1.00.a-gpio2";
+				#gpio-cells = <2>;
+				gpio-controller;
+				status = "okay";
+			};
+		};
+
+		gpio1: gpio@80000200 {
+			compatible = "xlnx,xps-gpio-1.00.a";
+			reg = <0x80000200 0x200>;
+			#gpio-cells = <2>;
+			gpio-controller;
+			status = "okay";
+			xlnx,all-outputs = <1>;
+			xlnx,gpio-width = <3>;
+		};
+
+		axi_i2c_0: axi_i2c@80000400 {
 			compatible = "xlnx,xps-iic-2.1";
 			status = "okay";
 			#address-cells = <1>;
 			#size-cells = <0>;
-			reg = <0x80000000 0x10000>;
+			reg = <0x80000400 0x200>;
 			interrupt-parent = <&gic>;
 			interrupts = <GIC_SPI 89 IRQ_TYPE_LEVEL
 					IRQ_DEFAULT_PRIORITY>;
@@ -118,6 +184,25 @@
 				reg = <0x3f>;
 				sampling-rate = <STTS22H_1Hz>;
 			};
+		};
+
+		axi_i2c_1: axi_i2c@80000600 {
+			compatible = "xlnx,xps-iic-2.1";
+			status = "okay";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x80000600 0x200>;
+			interrupt-parent = <&gic>;
+			interrupts = <GIC_SPI 90 IRQ_TYPE_LEVEL
+					IRQ_DEFAULT_PRIORITY>;
+		};
+
+		axi_uartlite: uart@0x80000800 {
+			compatible = "xlnx,xps-uartlite-1.00.a";
+			reg = <0x80000800 0x200>;
+			status = "okay";
+			interrupts = <GIC_SPI 92 IRQ_TYPE_LEVEL
+					IRQ_DEFAULT_PRIORITY>;
 		};
 	};
 };
