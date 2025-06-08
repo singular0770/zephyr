@@ -1,0 +1,56 @@
+# SPDX-License-Identifier: Apache-2.0
+#
+# Copyright (c) 2025 Michael Estes
+
+menuconfig MC6470
+	bool "MC6470 accelerometer driver"
+	default y
+	depends on DT_HAS_MEMSIC_MC6470_ACCEL_ENABLED
+	select I2C if $(dt_compat_on_bus,$(DT_COMPAT_MEMSIC_MC6470_ACCEL),i2c)
+	help
+	 Enable driver for MC6470 accelerometer.
+
+if MC6470
+
+config MC6470_TRIGGER
+	bool "Trigger mode"
+	depends on GPIO
+	depends on $(dt_compat_any_has_prop,$(DT_COMPAT_MEMSIC_MC6470_ACCEL),irq-gpios)
+
+choice MC6470_TRIGGER_MODE
+	prompt "Trigger mode"
+	default MC6470_TRIGGER_NONE
+	help
+	  Specify the type of triggering to be used by the driver.
+
+config MC6470_TRIGGER_NONE
+	bool "No trigger"
+
+config MC6470_TRIGGER_OWN_THREAD
+	bool "Use own thread"
+	select MC6470_TRIGGER
+	help
+	 Enable trigger to run in own thread. By
+	 default it is global thread mode.
+
+endchoice # MC6470_TRIGGER_MODE
+
+if MC6470_TRIGGER
+
+config MC6470_TAP_TRIGGER
+	bool "Tap detection"
+	default n
+
+config MC6470_THREAD_PRIORITY
+	int "Own thread priority"
+	depends on MC6470_TRIGGER_OWN_THREAD
+	default 10
+
+config MC6470_THREAD_STACK_SIZE
+	int "Own thread stask size"
+	depends on MC6470_TRIGGER_OWN_THREAD
+	default 1024
+
+endif # MC6470_TRIGGER
+
+endif # MC6470

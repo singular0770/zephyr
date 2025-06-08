@@ -1,0 +1,65 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2025 Michael Estes
+
+description: MEMSIC/MCube MC6470 I2C accelerometer
+
+compatible: "memsic,mc6470-accel"
+
+include: [sensor-device.yaml, i2c-device.yaml]
+
+properties:
+  irq-gpios:
+    type: phandle-array
+
+  odr:
+    type: string
+    description: |
+      The sample rate in hertz. Only the following values are allowed:
+        32    (default; chip reset value)
+        16
+        8
+        4
+        2
+        1
+        0.5
+        0.25
+        64
+        128
+        256
+    default: "32"
+    enum:
+      - "32"
+      - "16"
+      - "8"
+      - "4"
+      - "2"
+      - "1"
+      - "0.5"
+      - "0.25"
+      - "64"
+      - "128"
+      - "256"
+
+  range:
+    type: int
+    description: |
+      The range of measurement in G's
+    default: 2
+    enum:
+      - 2    # +/- 2G (default)
+      - 4    # +/- 4G
+      - 8    # +/- 8G
+      - 16   # +/- 16G
+
+  resolution:
+    type: int
+    description: |
+      The resolution of measurement in bits
+    default: 6
+    enum:
+      - 6   # (default)
+      - 7
+      - 8
+      - 10
+      - 12
+      - 14
