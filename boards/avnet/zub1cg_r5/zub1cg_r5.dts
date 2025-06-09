@@ -20,16 +20,17 @@
 	chosen {
 		zephyr,sram = &sram1;
 		zephyr,flash = &flash0;
-		zephyr,console = &axi_uartlite;
-		zephyr,shell-uart = &axi_uartlite;
+		zephyr,console = &uart0;
+		zephyr,shell-uart = &uart0;
 		zephyr,ocm = &ocm;
 	};
 
 	aliases {
-		led0 = &rgb2_red;
-		sw0 = &pl_push_btn;
+		led0 = &red_led_0;
+		sw0 = &mio_push_btn;
 		pressure-sensor = &lps22hh;
 		eeprom-0 = &eeprom0;
+		ambient-temp0 = &stts22h;
 	};
 
 	leds: leds{
@@ -56,32 +57,32 @@
 		};
 
 		rgb1_red: rbg1_red {
-			gpios = <&gpio0_2 2 GPIO_ACTIVE_HIGH>;
+			gpios = <&axi_gpio_0_2 2 GPIO_ACTIVE_HIGH>;
 			label = "RGB1 Red";
 		};
 		
 		rgb1_green: rbg1_green {
-			gpios = <&gpio0_2 1 GPIO_ACTIVE_HIGH>;
+			gpios = <&axi_gpio_0_2 1 GPIO_ACTIVE_HIGH>;
 			label = "RGB1 Green";
 		};
 
 		rgb1_blue: rbg1_blue {
-			gpios = <&gpio0_2 0 GPIO_ACTIVE_HIGH>;
+			gpios = <&axi_gpio_0_2 0 GPIO_ACTIVE_HIGH>;
 			label = "RGB1 Blue";
 		};
 
 		rgb2_red: rbg2_red {
-			gpios = <&gpio1 2 GPIO_ACTIVE_HIGH>;
+			gpios = <&axi_gpio_1 2 GPIO_ACTIVE_HIGH>;
 			label = "RGB2 Red";
 		};
 
 		rgb2_green: rbg2_green {
-			gpios = <&gpio1 1 GPIO_ACTIVE_HIGH>;
+			gpios = <&axi_gpio_1 1 GPIO_ACTIVE_HIGH>;
 			label = "RGB2 Green";
 		};
 		
 		rgb2_blue: rbg2_blue {
-			gpios = <&gpio1 0 GPIO_ACTIVE_HIGH>;
+			gpios = <&axi_gpio_1 0 GPIO_ACTIVE_HIGH>;
 			label = "RGB2 Blue";
 		};
 	};
@@ -95,7 +96,7 @@
 		};
 
 		pl_push_btn: pl_push_btn {
-			gpios = <&gpio0 0 GPIO_ACTIVE_LOW>;
+			gpios = <&axi_gpio_0 0 GPIO_ACTIVE_LOW>;
 			label = "PS Push Button";
 		};
 
@@ -142,14 +143,14 @@
 			zephyr,memory-attr = <(DT_MEM_ARM(ATTR_MPU_IO))>;
 		};
 
-		gpio0: gpio@80000000 {
+		axi_gpio_0: gpio@80000000 {
 			compatible = "xlnx,xps-gpio-1.00.a";
 			reg = <0x80000000 0x200>;
 			#gpio-cells = <2>;
 			gpio-controller;
 			status = "okay";
 			interrupt-parent = <&gic>;
-			interrupts = <GIC_SPI 91 IRQ_TYPE_LEVEL
+			interrupts = <GIC_SPI 92 IRQ_TYPE_LEVEL
 					IRQ_DEFAULT_PRIORITY>;
 			xlnx,all-inputs = <1>;
 			xlnx,all-outputs-2 = <1>;
@@ -157,7 +158,7 @@
 			xlnx,gpio2-width = <3>;
 			xlnx,is-dual = <1>;
 
-			gpio0_2: gpio2 {
+			axi_gpio_0_2: gpio2 {
 				compatible = "xlnx,xps-gpio-1.00.a-gpio2";
 				#gpio-cells = <2>;
 				gpio-controller;
@@ -165,7 +166,7 @@
 			};
 		};
 
-		gpio1: gpio@80000200 {
+		axi_gpio_1: gpio@80000200 {
 			compatible = "xlnx,xps-gpio-1.00.a";
 			reg = <0x80000200 0x200>;
 			#gpio-cells = <2>;
@@ -175,14 +176,14 @@
 			xlnx,gpio-width = <3>;
 		};
 
-		axi_i2c_0: axi_i2c@80000400 {
+		axi_iic_0: i2c@80000400 {
 			compatible = "xlnx,xps-iic-2.1";
 			status = "okay";
 			#address-cells = <1>;
 			#size-cells = <0>;
 			reg = <0x80000400 0x200>;
 			interrupt-parent = <&gic>;
-			interrupts = <GIC_SPI 89 IRQ_TYPE_LEVEL
+			interrupts = <GIC_SPI 91 IRQ_TYPE_LEVEL
 					IRQ_DEFAULT_PRIORITY>;
 
 			stts22h: stts22h@3f {
@@ -193,23 +194,28 @@
 			};
 		};
 
-		axi_i2c_1: axi_i2c@80000600 {
+		axi_iic_1: i2c@80000600 {
 			compatible = "xlnx,xps-iic-2.1";
 			status = "okay";
 			#address-cells = <1>;
 			#size-cells = <0>;
 			reg = <0x80000600 0x200>;
 			interrupt-parent = <&gic>;
-			interrupts = <GIC_SPI 90 IRQ_TYPE_LEVEL
+			interrupts = <GIC_SPI 89 IRQ_TYPE_LEVEL
 					IRQ_DEFAULT_PRIORITY>;
 		};
 
-		axi_uartlite: uart@0x80000800 {
+		axi_uartlite_0: serial@0x80000800 {
 			compatible = "xlnx,xps-uartlite-1.00.a";
 			reg = <0x80000800 0x200>;
 			status = "okay";
-			interrupts = <GIC_SPI 92 IRQ_TYPE_LEVEL
+			interrupts = <GIC_SPI 90 IRQ_TYPE_EDGE
 					IRQ_DEFAULT_PRIORITY>;
+			clock-frequency = <DT_FREQ_M(100)>;
+			data-bits = <8>;
+			stop-bits = "1";
+			parity = "none";
+			current-speed = <115200>;
 		};
 	};
 };
@@ -259,10 +265,10 @@
 	status = "okay";
 	clock-frequency = <DT_FREQ_M(100)>;
 
-    lps22hh: lps22hh@0 {
+    	lps22hh: lps22hh@0 {
 		compatible = "st,lps22hh";
 		reg = <0>;
       	odr = <LPS22HH_DT_ODR_1HZ>;
 		spi-max-frequency = <DT_FREQ_M(10)>;
-    };
+	};
 };
