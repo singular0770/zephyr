@@ -1,0 +1,11 @@
+# Copyright (c) 2025 Michael Estes
+# SPDX-License-Identifier: Apache-2.0
+
+config KTD202X
+	bool "KTD202X LED driver"
+	default y
+	depends on DT_HAS_KINETIC_KTD202X_ENABLED
+	select I2C
+	help
+	  Enable driver for the Kinetic KTD2026/2027 family of LED
+	  controllers.
