@@ -1,0 +1,9 @@
+# Copyright (c) 2025 Michael Estes
+# SPDX-License-Identifier: Apache-2.0
+
+description: |
+  KTD202x 3 or 4 channel LED driver
+
+compatible: "kinetic,ktd202x"
+
+include: i2c-device.yaml
