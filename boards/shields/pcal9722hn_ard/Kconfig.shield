@@ -1,0 +1,5 @@
+# Copyright (c) 2025 Michael Estes
+# SPDX-License-Identifier: Apache-2.0
+
+config SHIELD_PCAL9722HN_ARD
+	def_bool $(shields_list_contains,pcal9722hn_ard)

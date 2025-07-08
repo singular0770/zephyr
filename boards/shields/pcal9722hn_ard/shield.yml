@@ -1,0 +1,6 @@
+shield:
+  name: pcal9722hn_ard
+  full_name: NXP PCAL9722HN-ARD
+  vendor: nxp
+  supported_features:
+    - gpio

@@ -1,0 +1,150 @@
+/*
+ * Copyright (c) 2025 Michael Estes
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+ #include <freq.h>
+ #include <dt-bindings/gpio/gpio.h>
+
+/ {
+        aliases {
+                sw0 = &pcal_sw1;
+                led0 = &pcal_red_led_0;
+        };
+
+        leds {
+                compatible = "gpio-leds";
+
+                pcal_red_led_0: pcal_d2 {
+                        gpios = <&pcal9722 0 GPIO_ACTIVE_LOW>;
+                        label = "D2";
+                };
+
+                pcal_red_led_1: pcal_d3 {
+                        gpios = <&pcal9722 1 GPIO_ACTIVE_LOW>;
+                        label = "D3";
+                };
+
+                pcal_red_led_2: pcal_d4 {
+                        gpios = <&pcal9722 2 GPIO_ACTIVE_LOW>;
+                        label = "D4";
+                };
+
+                pcal_red_led_3: pcal_d5 {
+                        gpios = <&pcal9722 3 GPIO_ACTIVE_LOW>;
+                        label = "D5";
+                };
+
+                pcal_red_led_4: pcal_d6 {
+                        gpios = <&pcal9722 4 GPIO_ACTIVE_LOW>;
+                        label = "D6";
+                };
+
+                pcal_red_led_5: pcal_d7 {
+                        gpios = <&pcal9722 5 GPIO_ACTIVE_LOW>;
+                        label = "D7";
+                };
+
+                pcal_red_led_6: pcal_d8 {
+                        gpios = <&pcal9722 6 GPIO_ACTIVE_LOW>;
+                        label = "D8";
+                };
+
+                pcal_red_led_7: pcal_d9 {
+                        gpios = <&pcal9722 7 GPIO_ACTIVE_LOW>;
+                        label = "D9";
+                };
+
+                pcal_seg_a: pcal_seg_a {
+                        gpios = <&pcal9722 8 GPIO_ACTIVE_LOW>;
+                        label = "a";
+                };
+
+                pcal_seg_b: pcal_seg_b {
+                        gpios = <&pcal9722 9 GPIO_ACTIVE_LOW>;
+                        label = "b";
+                };
+
+                pcal_seg_c: pcal_seg_c {
+                        gpios = <&pcal9722 10 GPIO_ACTIVE_LOW>;
+                        label = "c";
+                };
+
+                pcal_seg_d: pcal_seg_d {
+                        gpios = <&pcal9722 11 GPIO_ACTIVE_LOW>;
+                        label = "d";
+                };
+
+                pcal_seg_e: pcal_seg_e {
+                        gpios = <&pcal9722 12 GPIO_ACTIVE_LOW>;
+                        label = "e";
+                };
+
+                pcal_seg_f: pcal_seg_f {
+                        gpios = <&pcal9722 13 GPIO_ACTIVE_LOW>;
+                        label = "f";
+                };
+
+                pcal_seg_g: pcal_seg_g {
+                        gpios = <&pcal9722 14 GPIO_ACTIVE_LOW>;
+                        label = "g";
+                };
+
+                pcal_seg_dp: pcal_seg_dp {
+                        gpios = <&pcal9722 15 GPIO_ACTIVE_LOW>;
+                        label = "D.P";
+                };
+        };
+
+        buttons {
+                compatible = "gpio-keys";
+
+                pcal_sw1: pcal_sw1 {
+                        gpios = <&pcal9722 16 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+                        label = "SW1";
+                };
+
+                pcal_sw2: pcal_sw2 {
+                        gpios = <&pcal9722 17 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+                        label = "SW2";
+                };
+
+                pcal_sw3: pcal_sw3 {
+                        gpios = <&pcal9722 18 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+                        label = "SW3";
+                };
+
+                pcal_sw4: pcal_sw4 {
+                        gpios = <&pcal9722 19 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+                        label = "SW4";
+                };
+
+                pcal_sw5: pcal_sw5 {
+                        gpios = <&pcal9722 20 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+                        label = "SW5";
+                };
+
+                pcal_sw6: pcal_sw6 {
+                        gpios = <&pcal9722 21 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+                        label = "SW6";
+                };
+        };
+};
+
+&arduino_spi {
+	status = "okay";
+	cs-gpios = <&arduino_header 16 GPIO_ACTIVE_LOW>;
+
+	pcal9722: gpio@0 {
+		compatible = "nxp,pcal9722";
+		status = "okay";
+		reg = <0>;
+		addr = <0x40>;
+		gpio-controller;
+		irq-gpios = <&arduino_header 13 GPIO_ACTIVE_LOW>;
+		ngpios = <22>;
+		#gpio-cells = <2>;
+		spi-max-frequency = <DT_FREQ_M(5)>;
+	};
+};
