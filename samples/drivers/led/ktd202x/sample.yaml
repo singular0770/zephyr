@@ -1,0 +1,8 @@
+sample:
+  description: Demonstration of the KTD202X LED driver
+  name: KTD202X sample
+tests:
+  sample.drivers.led.ktd2026:
+    depends_on: arduino_i2c
+    build_only: true
+    tags: LED
