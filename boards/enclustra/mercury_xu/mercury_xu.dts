@@ -7,6 +7,8 @@
 /dts-v1/;
 #include <arm/xilinx/zynqmp_rpu.dtsi>
 #include "mercury_xu-pinctrl.dtsi"
+#include <zephyr/dt-bindings/memory-attr/memory-attr-arm.h>
+#include <freq.h>
 
 / {
 	model = "Mercury XU";
@@ -15,13 +17,28 @@
 	chosen {
 		zephyr,console = &uart0;
 		zephyr,shell-uart = &uart0;
-		zephyr,sram = &sram0;
+		zephyr,sram = &sram1;
 		zephyr,flash = &flash0;
 	};
 
 	fpga0: fpga {
 		status = "okay";
 		compatible = "xlnx,fpga";
+	};
+
+	soc {
+		sram1: memory@3ed00000 {
+			compatible = "zephyr,memory-region", "mmio-sram";
+			reg = <0x3ed00000 DT_SIZE_K(256)>;
+			zephyr,memory-region = "SRAM1";
+			zephyr,memory-attr = <(DT_MEM_ARM(ATTR_MPU_RAM))>;
+		};
+	};
+
+	i2c_ref_clk: i2c_ref_clk {
+		compatible = "fixed-clock";
+		clock-frequency = <99999001>;
+		#clock-cells = <0>;
 	};
 };
 
@@ -45,4 +62,51 @@
 
 &psgpio {
 	status = "okay";
+};
+
+&spi0 {
+	status = "okay";
+	clock-frequency = <199998001>;
+
+	pcal9722: gpio@0 {
+		compatible = "nxp,pcal9722";
+		reg = <0>;
+		spi-max-frequency = <1000000>;
+		addr = <0x40>;
+		#gpio-cells = <2>;
+		ngpios = <22>;
+		gpio-controller;
+	};
+};
+
+&spi1 {
+	status = "disabled";
+	clock-frequency = <199998001>;
+};
+
+&i2c0 {
+	status = "okay";
+	clocks = <&i2c_ref_clk>;
+	clock-frequency = <400000>;
+};
+
+&i2c1 {
+	status = "okay";
+	clocks = <&i2c_ref_clk>;
+	clock-frequency = <400000>;
+
+	eeprom@50 {
+		/* M24M02-DRMN6TP aka U4 (2 Mbit eeprom) */
+		compatible = "st,m24m02", "st,m24xxx", "atmel,at24";
+		reg = <0x50>;
+		size = <DT_SIZE_K(256)>;
+		pagesize = <256>;
+		address-width = <16>;
+		timeout = <5>;
+	};
+};
+
+&can0 {
+	status = "okay";
+	clock-frequency = <16000000>;
 };
