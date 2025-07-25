@@ -164,9 +164,9 @@
 #define CAN_XLNX_ZYNQ_FIFO_DLCR_RXT_MASK 0xFFFFF
 
 /* I/O pin control macros, depending on this feature being enabled */
-#ifdef CONFIG_PINCTRL
+#if defined(CONFIG_PINCTRL) && !defined(CONFIG_SOC_XILINX_ZYNQMP)
 #define CAN_XLNX_ZYNQ_DEV_PINCTRL_DEFINE(inst) PINCTRL_DT_INST_DEFINE(inst);
-#define CAN_XLNX_ZYNQ_DEV_PINCTRL_INIT(inst) .pincfg = PINCTRL_DT_INST_DEV_CONFIG_GET(inst),
+#define CAN_XLNX_ZYNQ_DEV_PINCTRL_INIT(inst) .pin_config = PINCTRL_DT_INST_DEV_CONFIG_GET(inst),
 #else
 #define CAN_XLNX_ZYNQ_DEV_PINCTRL_DEFINE(inst)
 #define CAN_XLNX_ZYNQ_DEV_PINCTRL_INIT(inst)
@@ -265,7 +265,7 @@ struct can_xlnx_zynq_dev_cfg {
 	DEVICE_MMIO_NAMED_ROM(reg_base);
 	can_xlnx_zynq_config_irq_t irq_config_func;
 	uint32_t irq;
-#ifdef CONFIG_PINCTRL
+#if defined(CONFIG_PINCTRL) && !defined(CONFIG_SOC_XILINX_ZYNQMP)
 	const struct pinctrl_dev_config *pin_config;
 #endif
 

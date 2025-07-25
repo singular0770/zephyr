@@ -20,7 +20,7 @@
 #include <zephyr/drivers/can/transceiver.h>
 #include "can_xlnx_zynq.h"
 
-#ifdef CONFIG_PINCTRL
+#if defined(CONFIG_PINCTRL) && !defined(CONFIG_SOC_XILINX_ZYNQMP)
 #include <zephyr/drivers/pinctrl.h>
 #endif
 
@@ -941,7 +941,7 @@ int can_xlnx_zynq_init(const struct device *dev)
 		return -EIO;
 	}
 
-#ifdef CONFIG_PINCTRL
+#if defined(CONFIG_PINCTRL) && !defined(CONFIG_SOC_XILINX_ZYNQMP)
 	ret = pinctrl_apply_state(dev_conf->pin_config, PINCTRL_STATE_DEFAULT);
 	if (ret < 0) {
 		return ret;
@@ -952,7 +952,7 @@ int can_xlnx_zynq_init(const struct device *dev)
 	k_sem_init(&dev_data->tx_lock_sem, 1, 1);
 
 	/* Calculate initial timing config */
-	ret = can_calc_timing(dev, &dev_data->timing, dev_conf->common.bus_speed,
+	ret = can_calc_timing(dev, &dev_data->timing, dev_conf->common.bitrate,
 			      dev_conf->common.sample_point);
 	if (ret < 0) {
 		LOG_ERR("%s calculate timing failed (%d)", dev->name, ret);
@@ -980,7 +980,7 @@ int can_xlnx_zynq_init(const struct device *dev)
 }
 
 /* Driver API */
-static const struct can_driver_api can_xlnx_zynq_driver_api = {
+static DEVICE_API(can, can_xlnx_zynq_driver_api) = {
 	.start = can_xlnx_zynq_start,
 	.stop = can_xlnx_zynq_stop,
 	.get_capabilities = can_xlnx_zynq_get_capabilities,
