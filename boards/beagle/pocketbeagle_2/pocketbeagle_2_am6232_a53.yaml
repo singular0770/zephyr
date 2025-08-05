@@ -9,3 +9,5 @@ ram: 524288
 vendor: beagle
 supported:
   - uart
+  - i2c
+  - gpio

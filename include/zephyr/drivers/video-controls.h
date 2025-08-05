@@ -362,6 +362,9 @@ enum video_camera_orientation {
  */
 #define VIDEO_CID_IMAGE_PROC_CLASS_BASE 0x009f0900
 
+/** Link frequency, applicable for the CSI2 based devices */
+#define VIDEO_CID_LINK_FREQ (VIDEO_CID_IMAGE_PROC_CLASS_BASE + 1)
+
 /** Pixel rate (pixels/second) in the device's pixel array. This control is read-only. */
 #define VIDEO_CID_PIXEL_RATE (VIDEO_CID_IMAGE_PROC_CLASS_BASE + 2)
 
@@ -452,7 +455,9 @@ struct video_ctrl_range {
  * Used to query information about a control.
  */
 struct video_ctrl_query {
-	/** control id */
+	/** device being queried, application needs to set this field */
+	const struct device *dev;
+	/** control id, application needs to set this field */
 	uint32_t id;
 	/** control type */
 	uint32_t type;
@@ -463,7 +468,10 @@ struct video_ctrl_query {
 	/** control range */
 	struct video_ctrl_range range;
 	/** menu if control is of menu type */
-	const char *const *menu;
+	union {
+		const char *const *menu;
+		const int64_t *int_menu;
+	};
 };
 
 /**

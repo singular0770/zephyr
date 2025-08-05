@@ -1129,7 +1129,7 @@ void ull_conn_done(struct node_rx_event_done *done)
 #endif /* CONFIG_BT_PERIPHERAL */
 	}
 
-	elapsed_event = latency_event + lll->lazy_prepare + 1U;
+	elapsed_event = lll->lazy_prepare + 1U;
 
 	/* Reset supervision countdown */
 	if (done->extra.crc_valid && !done->extra.is_aborted) {
@@ -1910,7 +1910,8 @@ static void conn_cleanup_finalize(struct ll_conn *conn)
 				    TICKER_ID_CONN_BASE + lll->handle,
 				    ticker_stop_op_cb, conn);
 	LL_ASSERT((ticker_status == TICKER_STATUS_SUCCESS) ||
-		  (ticker_status == TICKER_STATUS_BUSY));
+		  (ticker_status == TICKER_STATUS_BUSY) ||
+		  ((void *)conn == ull_disable_mark_get()));
 
 	/* Invalidate the connection context */
 	lll->handle = LLL_HANDLE_INVALID;
@@ -1982,7 +1983,14 @@ static void ticker_stop_op_cb(uint32_t status, void *param)
 	static struct mayfly mfy = {0, 0, &link, NULL, conn_disable};
 	uint32_t ret;
 
-	LL_ASSERT(status == TICKER_STATUS_SUCCESS);
+	/* Peripheral ticker_stop succeeds, or it fails in a race condition
+	 * when disconnecting (race with ticker_stop), say on HCI Reset.
+	 */
+	if (status != TICKER_STATUS_SUCCESS) {
+		LL_ASSERT(param == ull_disable_mark_get());
+
+		return;
+	}
 
 	/* Check if any pending LLL events that need to be aborted */
 	mfy.param = param;
@@ -2177,6 +2185,11 @@ void ull_conn_resume_rx_data(struct ll_conn *conn)
 }
 #endif /* CONFIG_BT_CTLR_LE_ENC */
 
+uint16_t ull_conn_event_counter_at_prepare(const struct ll_conn *conn)
+{
+	return conn->lll.event_counter + conn->lll.latency_prepare + conn->llcp.prep.lazy;
+}
+
 uint16_t ull_conn_event_counter(struct ll_conn *conn)
 {
 	struct lll_conn *lll;
@@ -2204,6 +2217,7 @@ uint16_t ull_conn_event_counter(struct ll_conn *conn)
 
 	return event_counter;
 }
+
 static void ull_conn_update_ticker(struct ll_conn *conn,
 				   uint32_t ticks_win_offset,
 				   uint32_t ticks_slot_overhead,
@@ -2281,7 +2295,7 @@ void ull_conn_update_parameters(struct ll_conn *conn, uint8_t is_cu_proc, uint8_
 	lll = &conn->lll;
 
 	/* Calculate current event counter */
-	event_counter = ull_conn_event_counter(conn);
+	event_counter = ull_conn_event_counter_at_prepare(conn);
 
 	instant_latency = (event_counter - instant) & 0xFFFF;
 
@@ -2363,7 +2377,7 @@ void ull_conn_update_parameters(struct ll_conn *conn, uint8_t is_cu_proc, uint8_
 	periodic_us = conn_interval_us;
 
 	conn_interval_old_us = conn_interval_old * conn_interval_unit_old;
-	latency_upd = conn_interval_old_us / conn_interval_us;
+	latency_upd = DIV_ROUND_UP(conn_interval_old_us, conn_interval_us);
 	conn_interval_new_us = latency_upd * conn_interval_us;
 	if (conn_interval_new_us > conn_interval_old_us) {
 		ticks_at_expire += HAL_TICKER_US_TO_TICKS(
