@@ -304,7 +304,6 @@
 					IRQ_DEFAULT_PRIORITY>;
 			reg = <0xfd070000 0x30000>;
 		};
-	};
 
 		spi0: spi@ff040000 {
 			compatible = "cdns,spi";
